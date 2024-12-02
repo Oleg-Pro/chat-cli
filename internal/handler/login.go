@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"context"
-
+	"log"
+	"context"	
 	"github.com/Oleg-Pro/chat-cli/internal/model"
 )
 
@@ -36,6 +36,10 @@ func (h *Handler) Login(ctx context.Context, info *model.AuthInfo) error {
 	if err != nil {
 		return err
 	}
+
+
+	log.Printf("Access token: %s\n", accessToken)
+	log.Printf("Refresh token: %s\n", refreshToken)	
 
 	return nil
 }
