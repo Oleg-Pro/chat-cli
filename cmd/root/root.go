@@ -68,7 +68,6 @@ var createChatCmd = &cobra.Command{
 			log.Fatalf("usernames must be not empty")
 		}
 
-
 		ctx := cmd.Context()
 		serviceProvider := app.NewServiceProvider()
 		handlerService := serviceProvider.GetHandlerService(ctx)
@@ -102,7 +101,6 @@ var connectCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("failed to convert chatId to int: %s\n", err.Error())			
 		}
-
 
 		err = handlerService.ConnectChat(ctx, chatID)
 		if err != nil {
