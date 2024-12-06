@@ -4,7 +4,6 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package root
 
 import (
-//	"context"
 	"log"
 	"os"
 	"strings"

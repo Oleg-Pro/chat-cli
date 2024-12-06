@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	myGrps "github.com/Oleg-Pro/chat-cli/internal/client/grpc"	
 	"github.com/Oleg-Pro/chat-cli/internal/client/grpc/auth"
 	chatServer "github.com/Oleg-Pro/chat-cli/internal/client/grpc/chat_server"
 	"github.com/Oleg-Pro/chat-cli/internal/client/redis"
@@ -12,13 +13,17 @@ import (
 	"github.com/Oleg-Pro/chat-cli/internal/handler"
 	"github.com/Oleg-Pro/chat-cli/internal/interceptor"
 	"google.golang.org/grpc"
-//	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+const (
+	grpcAddress = "localhost:50052"
+) 
+
+
 type ServiceProvider struct {
-	authClient       auth.Client
-	chatServerClient chatServer.Client
+	authClient       myGrps.AuthClient
+	chatServerClient myGrps.ChatServerClient
 	redisClient      redis.Client
 
 	handlerService *handler.Handler
@@ -28,7 +33,7 @@ func NewServiceProvider() *ServiceProvider {
 	return &ServiceProvider{}
 }
 
-func (s *ServiceProvider) GetAuthClient(ctx context.Context) auth.Client {
+func (s *ServiceProvider) GetAuthClient(ctx context.Context) myGrps.AuthClient {
 	if s.authClient == nil {
 		con, err := grpc.DialContext(
 			ctx,
@@ -46,14 +51,14 @@ func (s *ServiceProvider) GetAuthClient(ctx context.Context) auth.Client {
 	return s.authClient
 }
 
-func (s *ServiceProvider) GetChatClient(ctx context.Context) chatServer.Client {
+func (s *ServiceProvider) GetChatClient(ctx context.Context) myGrps.ChatServerClient {
 	if s.chatServerClient == nil {
 		authInterceptor := interceptor.NewAuthInterceptor(s.GetAuthClient(ctx), s.GetRedisClient())
 		authInterceptor.Run(60*time.Minute, 1*time.Minute)
 
 		conn, err := grpc.DialContext(
 			ctx,
-			"localhost:50052",
+			grpcAddress,
 			grpc.WithUnaryInterceptor(authInterceptor.Unary),
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 		)

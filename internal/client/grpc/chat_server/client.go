@@ -5,19 +5,12 @@ import (
 
 	"github.com/Oleg-Pro/chat-cli/internal/model"
 	chatV1 "github.com/Oleg-Pro/chat-server/pkg/chat_v1"
+	myGrps "github.com/Oleg-Pro/chat-cli/internal/client/grpc"		
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var _ Client = (*client)(nil)
-
-
-
-type Client interface {
-	CreateChat(ctx context.Context, usernames []string) (int64, error)
-	ConnectChat(ctx context.Context, chatID int64, username string) (chatV1.ChatV1_ConnectClient, error)
-	SendMessage(ctx context.Context, chatID int64, message *model.Message) error
-}
+var _ myGrps.ChatServerClient = (*client)(nil)
 
 type client struct {
 	client chatV1.ChatV1Client

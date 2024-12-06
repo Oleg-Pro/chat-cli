@@ -3,21 +3,20 @@ package interceptor
 import (
 	"context"
 	"time"
-
-	"github.com/Oleg-Pro/chat-cli/internal/client/grpc/auth"
 	"github.com/Oleg-Pro/chat-cli/internal/client/redis"
 	"github.com/Oleg-Pro/chat-cli/internal/model"
+	myGrps "github.com/Oleg-Pro/chat-cli/internal/client/grpc"		
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
 type AuthInterceptor struct {
-	authClient  auth.Client
+	authClient  myGrps.AuthClient
 	redisClient redis.Client
 }
 
-func NewAuthInterceptor(authClient auth.Client, redisClient redis.Client) *AuthInterceptor {
+func NewAuthInterceptor(authClient myGrps.AuthClient, redisClient redis.Client) *AuthInterceptor {
 	return &AuthInterceptor{
 		authClient:  authClient,
 		redisClient: redisClient,
@@ -27,6 +26,7 @@ func NewAuthInterceptor(authClient auth.Client, redisClient redis.Client) *AuthI
 func (i *AuthInterceptor) Run(refreshTokenPeriod time.Duration, accessTokenPeriod time.Duration) {
 	go func() {
 		t := time.NewTicker(refreshTokenPeriod)
+		defer t.Stop()
 		ctx := context.Background()
 
 		for _ = range t.C {
@@ -63,6 +63,7 @@ func (i *AuthInterceptor) Run(refreshTokenPeriod time.Duration, accessTokenPerio
 
 	go func() {
 		t := time.NewTicker(accessTokenPeriod)
+		defer t.Stop()		
 		ctx := context.Background()
 
 		for _ = range t.C {
